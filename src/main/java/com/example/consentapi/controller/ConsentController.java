@@ -72,27 +72,10 @@ public class ConsentController {
     }
 
 
-    @GetMapping("/systemuser/byExternalId")
-    public String getSystemUser() {
-        try {
-            Thread.sleep(3000);
-        } catch (InterruptedException e) {
-            throw new RuntimeException(e);
-        }
-        return "systemuser";
-    }
-
     @GetMapping("/accessmanagement/api/v1/maskinporten/consent/lookup/")
     public Map<String, Object> getConsent() {
         return getJsonMockResponse("b55b0a8c-46db-4239-a417-a89daabfabba", "urn:altinn:person:identifier-no:01039012345", "urn:altinn:organization:identifier-no:984851006");
 
-    }
-
-
-    @PostMapping(path = "/badreq", produces = MediaType.APPLICATION_JSON_VALUE, consumes = "application/x-www-form-urlencoded;charset=UTF-8")
-    public ResponseEntity<Map<String, Object>> badReq() {
-
-        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
     }
 
 
@@ -102,24 +85,23 @@ public class ConsentController {
         final HttpHeaders httpHeaders = new HttpHeaders();
         httpHeaders.setContentType(MediaType.APPLICATION_JSON);
         Map<String, Object> json = Map.of("me", "hello mr post 4");
-        ResponseEntity<Map<String, Object>> response = new ResponseEntity<>(json, httpHeaders, HttpStatus.OK);
-        return response;
+        return new ResponseEntity<>(json, httpHeaders, HttpStatus.OK);
     }
 
     @PostMapping(path = "/accessmanagement/api/v1/maskinporten/consent/lookup3/", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Map<String, Object>> getConsentPost() {
-/*        try {
+        // test exception handling
+        try {
             Thread.sleep(3000);
         } catch (InterruptedException e) {
             throw new RuntimeException(e);
-        }*/
+        }
         String id = "b55b0a8c-46db-4239-a417-a89daabfabba";
         String from = "urn:altinn:person:identifier-no:30886994385";
         String to = "urn:altinn:organization:identifier-no:991825827";
         final HttpHeaders httpHeaders = new HttpHeaders();
         httpHeaders.setContentType(MediaType.APPLICATION_JSON);
         Map<String, Object> json = getJsonMockResponse(id, from, to);
-        ResponseEntity<Map<String, Object>> response = new ResponseEntity<>(json, httpHeaders, HttpStatus.OK);
-        return response;
+        return new ResponseEntity<>(json, httpHeaders, HttpStatus.OK);
     }
 }
