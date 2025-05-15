@@ -1,0 +1,14 @@
+version: '3.8'
+
+networks:
+  maskinporten:
+    name: maskinporten
+
+services:
+  consent-api:
+    build: ./
+    ports:
+      - "8889:8080"
+    networks:
+      - maskinporten
+    container_name: consent-api
