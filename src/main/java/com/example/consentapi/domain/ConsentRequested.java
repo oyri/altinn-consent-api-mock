@@ -1,4 +1,4 @@
-package com.example.consentapi.controller;
+package com.example.consentapi.domain;
 
 public record ConsentRequested(String id, String from, String to) {
 

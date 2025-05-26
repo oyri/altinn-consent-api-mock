@@ -1,13 +1,14 @@
 package com.example.consentapi.controller;
 
+import com.example.consentapi.domain.ConsentRequested;
+import com.example.consentapi.domain.ConsentResponse;
+import com.example.consentapi.domain.ErrorResponse;
+import com.example.consentapi.domain.InvalidConsentException;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Map;
@@ -18,21 +19,47 @@ import java.util.UUID;
 public class ConsentController {
 
 
+    // Takes precedence over the global error handler
+    //@ExceptionHandler(InvalidConsentException.class)
+    public ResponseEntity<ErrorResponse> handleInvalidConsentException(InvalidConsentException e) {
+
+        return ResponseEntity
+                .status(HttpStatus.BAD_REQUEST)
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(new ErrorResponse("Invalid request", e.getMessage()));
+    }
+
+
     @PostMapping(path = "/accessmanagement/api/v1/maskinporten/consent/lookup/", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Map<String, Object>> getConsentPost(@RequestBody ConsentRequested request) {
+    public ResponseEntity<ConsentResponse> getConsentPost(@RequestBody ConsentRequested request) {
 
         String id = request.id();
         String from = request.from();
         String to = request.to();
 
+        if ("cf8d5978-9ce9-4b4d-8622-dcb8ca1cc4b2".equals(id)) {
+            throw new InvalidConsentException("You had a special id=%s and will always be doomed to fail".formatted(id));
+        }
+
         final HttpHeaders httpHeaders = new HttpHeaders();
         httpHeaders.setContentType(MediaType.APPLICATION_JSON);
         Map<String, Object> json = getJsonMockResponse(id, from, to);
 
-        return new ResponseEntity<>(json, httpHeaders, HttpStatus.OK);
+        return new ResponseEntity<>(new ConsentResponse(json), httpHeaders, HttpStatus.OK);
 
     }
 
+    private String getJsonProblemDetails(String id) {
+        return """
+                {
+                  "type": "https://tools.ietf.org/html/rfc7807",
+                  "title": "An error occurred while processing your request.",
+                  "code": "STD-00001",
+                  "status": 400,
+                  "detail": "You had a special id=%s and will always be doomed to fail.",
+                }
+                """.formatted(id);
+    }
 
     private Map<String, Object> getJsonMockResponse(String id, String from, String to) {
         return Map.of(
