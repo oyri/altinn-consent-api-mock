@@ -1,8 +1,6 @@
 package com.example.consentapi.controller;
 
 import com.example.consentapi.domain.ConsentRequested;
-import com.example.consentapi.domain.ConsentResponse;
-import com.example.consentapi.domain.ErrorResponse;
 import com.example.consentapi.domain.InvalidConsentException;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -21,17 +19,17 @@ public class ConsentController {
 
     // Takes precedence over the global error handler
     //@ExceptionHandler(InvalidConsentException.class)
-    public ResponseEntity<ErrorResponse> handleInvalidConsentException(InvalidConsentException e) {
+    public ResponseEntity<String> handleInvalidConsentException(InvalidConsentException e) {
 
         return ResponseEntity
                 .status(HttpStatus.BAD_REQUEST)
                 .contentType(MediaType.APPLICATION_JSON)
-                .body(new ErrorResponse("Invalid request", e.getMessage()));
+                .body("Invalid request: " + e.getMessage());
     }
 
 
     @PostMapping(path = "/accessmanagement/api/v1/maskinporten/consent/lookup/", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<ConsentResponse> getConsentPost(@RequestBody ConsentRequested request) {
+    public ResponseEntity<Map<String, Object>> getConsentPost(@RequestBody ConsentRequested request) {
 
         String id = request.id();
         String from = request.from();
@@ -45,7 +43,7 @@ public class ConsentController {
         httpHeaders.setContentType(MediaType.APPLICATION_JSON);
         Map<String, Object> json = getJsonMockResponse(id, from, to);
 
-        return new ResponseEntity<>(new ConsentResponse(json), httpHeaders, HttpStatus.OK);
+        return new ResponseEntity<>(json, httpHeaders, HttpStatus.OK);
 
     }
 

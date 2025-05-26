@@ -9,6 +9,11 @@ services:
     build: ./
     ports:
       - "8889:8080"
+      - "5089:5006"
     networks:
       - maskinporten
     container_name: consent-api
+    entrypoint: "/bin/bash -c"
+    command:
+      - |
+        java -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5006 -jar app.jar
